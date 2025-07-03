@@ -35,9 +35,13 @@ function getPdfTextContent(buffer, opts = {}) {
 }
 
 describe('GET /api/render', () => {
-  it('request must have "url" query parameter', () =>
-    request(app).get('/api/render').expect(400)
-  );
+  it('request must have "url" query parameter', () => {
+    request(app).get('/api/render')
+      .expect(400)
+      .end((err, res) => {
+        debugger;
+      });
+  });
 
   it('invalid cert should cause an error', () =>
     request(app)
