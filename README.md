@@ -1,5 +1,10 @@
+[![Tests](https://github.com/andrepiske/webrender-api/actions/workflows/test.yml/badge.svg)](https://github.com/andrepiske/webrender-api/actions/workflows/test.yml)
 
-This is a hard fork from the url-to-pdf-api repository at commit [2fa83fd9f88613b76ba452fe25830e98d844f3b0](https://github.com/alvarcarto/url-to-pdf-api/commit/2fa83fd9f88613b76ba452fe25830e98d844f3b0).
+Note: it seems the original author has given up the repository (I'm very thankful for all the effort put into this so far!), so I'm forking and doing a few updates, adding CI and providing Dockerfiles.
+
+The API is backwards compatible.
+
+Here is the original README.md contents:
 
 <br><br><br><br>
 # URL to PDF Microservice
