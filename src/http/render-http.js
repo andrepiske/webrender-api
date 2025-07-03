@@ -31,7 +31,7 @@ const getRender = ex.createRoute((req, res) => {
         res.attachment(opts.attachmentName);
       }
       res.set('content-type', getMimeType(opts));
-      res.send(data);
+      res.send((data instanceof Uint8Array) ? Buffer.from(data) : data);
     });
 });
 
@@ -66,7 +66,7 @@ const postRender = ex.createRoute((req, res) => {
         res.attachment(opts.attachmentName);
       }
       res.set('content-type', getMimeType(opts));
-      res.send(data);
+      res.send((data instanceof Uint8Array) ? Buffer.from(data) : data);
     });
 });
 

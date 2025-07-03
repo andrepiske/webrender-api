@@ -4,11 +4,11 @@
   "description": "Web page PDF rendering done right. Packaged to an easy API.",
   "main": "src/index.js",
   "engines": {
-    "node": "10.x.x"
+    "node": "22.x.x"
   },
   "scripts": {
     "start": "env-cmd nodemon --watch ./src -e js src/index.js",
-    "test": "mocha --timeout 10000 && npm run lint",
+    "test": "mocha --timeout 30000 && npm run lint",
     "lint": "eslint ."
   },
   "repository": {
@@ -26,24 +26,24 @@
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "cors": "^2.8.4",
-    "express": "^4.15.5",
+    "express": "^4.21.2",
     "express-validation": "^1.0.2",
     "joi": "^11.1.1",
     "lodash": "^4.17.15",
     "morgan": "^1.9.1",
     "normalize-url": "^5.0.0",
-    "pdf-parse": "^1.1.1",
-    "puppeteer": "^2.0.0",
+    "puppeteer": "^24.10.2",
     "server-destroy": "^1.0.1",
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "pdf-parse": "^1.1.1",
     "chai": "^4.1.2",
     "env-cmd": "^9.0.1",
     "eslint": "^4.8.0",
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-plugin-import": "^2.7.0",
-    "mocha": "^4.0.1",
+    "mocha": "^11.7.1",
     "nodemon": "^1.12.1",
     "supertest": "^3.0.0"
   }

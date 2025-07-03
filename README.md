@@ -1,7 +1,7 @@
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/alvarcarto/url-to-pdf-api)
 
-[![Build Status](https://travis-ci.org/alvarcarto/url-to-pdf-api.svg?branch=master)](https://travis-ci.org/alvarcarto/url-to-pdf-api)
+This is a hard fork from the url-to-pdf-api repository at commit [2fa83fd9f88613b76ba452fe25830e98d844f3b0](https://github.com/alvarcarto/url-to-pdf-api/commit/2fa83fd9f88613b76ba452fe25830e98d844f3b0).
 
+<br><br><br><br>
 # URL to PDF Microservice
 
 > Web page PDF rendering done right. Microservice for rendering receipts, invoices, or any content. Packaged to an easy API.

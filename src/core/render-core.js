@@ -3,24 +3,33 @@ const _ = require('lodash');
 const config = require('../config');
 const logger = require('../util/logger')(__filename);
 
-
 async function createBrowser(opts) {
   const browserOpts = {
-    ignoreHTTPSErrors: opts.ignoreHttpsErrors,
+    acceptInsecureCerts: opts.ignoreHttpsErrors,
     sloMo: config.DEBUG_MODE ? 250 : undefined,
   };
   if (config.BROWSER_WS_ENDPOINT) {
     browserOpts.browserWSEndpoint = config.BROWSER_WS_ENDPOINT;
     return puppeteer.connect(browserOpts);
-  }
-  if (config.BROWSER_EXECUTABLE_PATH) {
+  } else if (config.BROWSER_EXECUTABLE_PATH) {
     browserOpts.executablePath = config.BROWSER_EXECUTABLE_PATH;
   }
-  browserOpts.headless = !config.DEBUG_MODE;
-  browserOpts.args = ['--no-sandbox', '--disable-setuid-sandbox'];
-  if (!opts.enableGPU || navigator.userAgent.indexOf('Win') !== -1) {
-    browserOpts.args.push('--disable-gpu');
-  }
+  browserOpts.headless = config.HEADLESS_MODE;
+  browserOpts.args = [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
+    '--disable-gpu',
+    '--disable-features=ChromeWhatsNewUI',
+    '--disable-features=VizDisplayCompositor',
+    '--disable-features=InterestFeedContentSuggestions',
+    '--disable-features=Translate',
+    '--no-default-browser-check',
+  ];
+
   return puppeteer.launch(browserOpts);
 }
 
@@ -73,16 +82,26 @@ async function render(_opts = {}) {
   logOpts(opts);
 
   const browser = await createBrowser(opts);
-  const page = await browser.newPage();
+  logger.info(`Browser version: ${await browser.version()}`);
+  logger.info(`Browser UA: ${await browser.userAgent()}`);
 
-  page.on('console', (...args) => logger.info('PAGE LOG:', ...args));
+  const page = await browser.newPage();
+  page.setDefaultNavigationTimeout(60000); // 60 seconds
+  page.setDefaultTimeout(60000);
+
+  page.on('console', (msg) => {
+    let loc = msg.location();
+    if (loc) {
+      loc = `${loc.url}:${loc.lineNumber}:${loc.columnNumber}`;
+    }
+    logger.info(`PAGE LOG (${loc}): `, msg.text());
+  });
 
   page.on('error', (err) => {
     logger.error(`Error event emitted: ${err}`);
     logger.error(err.stack);
     browser.close();
   });
-
 
   this.failedResponses = [];
   page.on('requestfailed', (request) => {
@@ -108,7 +127,7 @@ async function render(_opts = {}) {
     await page.setViewport(opts.viewport);
     if (opts.emulateScreenMedia) {
       logger.info('Emulate @media screen..');
-      await page.emulateMedia('screen');
+      await page.emulateMediaType('screen');
     }
 
     if (opts.cookies && opts.cookies.length > 0) {
@@ -128,9 +147,14 @@ async function render(_opts = {}) {
       await page.goto(opts.url, opts.goto);
     }
 
-    if (_.isNumber(opts.waitFor) || _.isString(opts.waitFor)) {
+    logger.info('html is set!');
+    if (_.isNumber(opts.waitFor)) {
+      const time = parseInt(opts.waitFor, 10);
+      logger.info(`Wait for ${time}ms ..`);
+      await (async () => new Promise(resolve => setTimeout(resolve, time)))();
+    } else if (_.isString(opts.waitFor)) {
       logger.info(`Wait for ${opts.waitFor} ..`);
-      await page.waitFor(opts.waitFor);
+      await page.waitForSelector(opts.waitFor);
     }
 
     if (opts.scrollPage) {
@@ -141,7 +165,11 @@ async function render(_opts = {}) {
     if (this.failedResponses.length) {
       logger.warn(`Number of failed requests: ${this.failedResponses.length}`);
       this.failedResponses.forEach((response) => {
-        logger.warn(`${response.status} ${response.url}`);
+        try {
+          logger.warn(`${response._response.status()} ${response.url()}`);
+        } catch (e) {
+          logger.warn(`Failed to log response: ${e}`);
+        }
       });
 
       if (opts.failEarly === 'all') {

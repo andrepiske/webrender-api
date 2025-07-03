@@ -70,10 +70,10 @@ describe('POST /api/render', () => {
       .expect(400)
   );
 
-  it('render github.com should succeed', () =>
+  it('render google.com should succeed', () =>
     request(app)
       .post('/api/render')
-      .send({ url: 'https://github.com' })
+      .send({ url: 'https://google.com' })
       .set('content-type', 'application/json')
       .set('Connection', 'keep-alive')
       .expect(200)
@@ -148,16 +148,16 @@ describe('POST /api/render', () => {
     request(app)
       .post('/api/render')
       .send({
-        url: 'http://www.html-kit.com/tools/cookietester/',
+        url: 'https://httpbingo.org/cookies',
         cookies:
               [{
                 name: 'url-to-pdf-test',
                 value: 'test successful',
-                domain: 'www.html-kit.com',
+                domain: 'httpbingo.org',
               }, {
                 name: 'url-to-pdf-test-2',
                 value: 'test successful 2',
-                domain: 'www.html-kit.com',
+                domain: 'httpbingo.org',
               }],
       })
       .set('Connection', 'keep-alive')
@@ -178,9 +178,8 @@ describe('POST /api/render', () => {
           fs.writeFileSync('./cookies-content.txt', text);
         }
 
-        chai.expect(text).to.have.string('Number-of-cookies-received-2');
-        chai.expect(text).to.have.string('Cookie-named-url-to-pdf-test');
-        chai.expect(text).to.have.string('Cookie-named-url-to-pdf-test-2');
+        chai.expect(text).to.have.string('url-to-pdf-test-test-successful');
+        chai.expect(text).to.have.string('url-to-pdf-test-2-test-successful-2');
       })
   );
 

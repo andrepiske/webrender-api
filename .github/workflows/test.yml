@@ -1,0 +1,22 @@
+name: Docker Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t urlapi .
+
+      - name: Run tests inside Docker container
+        run: |
+          docker run --rm -t -e ALLOW_HTTP=true urlapi bash -c 'npm install && npm run test'
