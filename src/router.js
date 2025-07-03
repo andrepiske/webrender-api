@@ -32,11 +32,6 @@ function createRouter() {
   const postRenderSchema = {
     body: renderBodySchema,
     query: sharedQuerySchema,
-    // options: {
-    //   // Without this option, text body causes an error
-    //   // https://github.com/AndrewKeig/express-validation/issues/36
-    //   contextRequest: true,
-    // },
   };
   router.post('/api/render', validate(postRenderSchema), render.postRender);
 
