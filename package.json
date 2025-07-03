@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "env-cmd node .",
-    "test": "mocha --timeout 30000 && npm run lint",
+    "test": "mocha --timeout 30000 --exit && npm run lint",
     "lint": "eslint ."
   },
   "repository": {
