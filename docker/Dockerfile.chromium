@@ -1,0 +1,75 @@
+FROM debian:bookworm-slim
+
+ENV LANG=C.UTF-8
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      # gnupg is required to install Node
+      gnupg \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+ENV NODE_VERSION=22.17.0
+ENV NODE_MAJOR=22
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    echo "Package: nodejs" | tee /etc/apt/preferences.d/nodejs > /dev/null && \
+    echo "Pin: origin deb.nodesource.com" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
+    echo "Pin-Priority: 600" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
+    apt-get update -y && \
+    apt-get install -y --no-install-recommends nodejs=${NODE_VERSION}-1nodesource1 && \
+    rm -rf /var/lib/apt/lists/* ; \
+    corepack enable && \
+    npm i -g npm && \
+    # smoke tests
+    node --version && npm --version && yarn --version
+
+# Install Chromium
+# ARG CHROMIUM_VERSION="latest"
+ARG CHROMIUM_VERSION="138.0.7204.92"
+ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
+RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
+  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
+  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
+  && apt-get update -qqy \
+  && if [ "${CHROMIUM_VERSION}" = "latest" ]; \
+      then apt-get -y --no-install-recommends install chromium-common chromium chromium-l10n ; \
+     else mkdir -p /tmp/chromium \
+      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-common_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-common.deb \
+      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium.deb \
+      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-l10n_${CHROMIUM_VERSION}-1_all.deb -o /tmp/chromium/chromium-l10n.deb \
+      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-driver_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-driver.deb \
+      && apt-get -qqyf install /tmp/chromium/chromium-common.deb /tmp/chromium/chromium.deb /tmp/chromium/chromium-l10n.deb /tmp/chromium/chromium-driver.deb \
+      && rm -rf /tmp/chromium; \
+    fi \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+ENV BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PORT=9000
+
+RUN set -eux ; \
+  groupadd --gid 1000 node &&  \
+  useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+
+ENV HOME=/home/node
+ARG APP_HOME=/home/node/srv
+WORKDIR $APP_HOME
+
+RUN chown -R node:node $APP_HOME
+
+USER node
+
+# Uncomment when iterating locally to move faster:
+#   COPY --chown=1000:1000 package.json ./
+#   COPY --chown=1000:1000 package-lock.json ./
+#   RUN npm install --omit=dev
+
+COPY --chown=1000:1000 . ./
+
+RUN npm install --omit=dev
+
+EXPOSE $PORT
+CMD ["node", "."]
