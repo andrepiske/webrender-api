@@ -23,7 +23,7 @@ function createErrorResponder(_opts) {
       message = httpMessage;
     }
 
-    const isPrettyValidationErr = _.has(err, 'errors');
+    const isPrettyValidationErr = _.has(err, 'details');
     const body = isPrettyValidationErr
       ? JSON.stringify(err)
       : { status, statusText: httpMessage, messages: [message] };

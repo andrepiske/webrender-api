@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const validate = require('express-validation');
+const { validate } = require('express-validation');
 const express = require('express');
 const render = require('./http/render-http');
 const config = require('./config');
@@ -26,26 +26,12 @@ function createRouter() {
     logger.warn('Warning: no authentication required to use the API');
   }
 
-  const getRenderSchema = {
-    query: renderQuerySchema,
-    options: {
-      allowUnknownBody: false,
-      allowUnknownQuery: false,
-    },
-  };
+  const getRenderSchema = { query: renderQuerySchema };
   router.get('/api/render', validate(getRenderSchema), render.getRender);
 
   const postRenderSchema = {
     body: renderBodySchema,
     query: sharedQuerySchema,
-    options: {
-      allowUnknownBody: false,
-      allowUnknownQuery: false,
-
-      // Without this option, text body causes an error
-      // https://github.com/AndrewKeig/express-validation/issues/36
-      contextRequest: true,
-    },
   };
   router.post('/api/render', validate(postRenderSchema), render.postRender);
 
@@ -53,5 +39,7 @@ function createRouter() {
 
   return router;
 }
+
+createRouter();
 
 module.exports = createRouter;

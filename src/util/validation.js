@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const { Joi } = require('express-validation');
 
 const urlSchema = Joi.string().uri({
   scheme: [
@@ -30,7 +30,7 @@ const sharedQuerySchema = Joi.object({
     Joi.string().min(1).max(2000),
   ]),
   cookies: Joi.array().items(cookieSchema),
-  output: Joi.string().valid(['pdf', 'screenshot', 'html']),
+  output: Joi.string().valid('pdf', 'screenshot', 'html'),
   'viewport.width': Joi.number().min(1).max(30000),
   'viewport.height': Joi.number().min(1).max(30000),
   'viewport.deviceScaleFactor': Joi.number().min(0).max(100),
@@ -56,7 +56,7 @@ const sharedQuerySchema = Joi.object({
   'pdf.printBackground': Joi.boolean(),
   'screenshot.fullPage': Joi.boolean(),
   'screenshot.quality': Joi.number().integer().min(0).max(100),
-  'screenshot.type': Joi.string().valid(['png', 'jpeg']),
+  'screenshot.type': Joi.string().valid('png', 'jpeg'),
   'screenshot.clip.x': Joi.number(),
   'screenshot.clip.y': Joi.number(),
   'screenshot.clip.width': Joi.number(),
@@ -77,7 +77,7 @@ const renderBodyObject = Joi.object({
   ignoreHttpsErrors: Joi.boolean(),
   emulateScreenMedia: Joi.boolean(),
   cookies: Joi.array().items(cookieSchema),
-  output: Joi.string().valid(['pdf', 'screenshot', 'html']),
+  output: Joi.string().valid('pdf', 'screenshot', 'html'),
   viewport: Joi.object({
     width: Joi.number().min(1).max(30000),
     height: Joi.number().min(1).max(30000),
@@ -116,7 +116,7 @@ const renderBodyObject = Joi.object({
   screenshot: Joi.object({
     fullPage: Joi.boolean(),
     quality: Joi.number().integer().min(0).max(100),
-    type: Joi.string().valid(['png', 'jpeg']),
+    type: Joi.string().valid('png', 'jpeg'),
     clip: {
       x: Joi.number(),
       y: Joi.number(),
@@ -139,4 +139,3 @@ module.exports = {
   renderBodySchema,
   sharedQuerySchema,
 };
-
