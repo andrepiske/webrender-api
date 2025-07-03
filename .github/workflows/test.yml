@@ -8,14 +8,25 @@ on:
       - '**'
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: Test using ${{ matrix.label }}
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        include:
+        - { label: 'Chrome', browser: 'chrome', platform: 'ubuntu-latest' }
+        - { label: 'Chromium', browser: 'chromium', platform: 'ubuntu-latest' }
+        - { label: 'ARM Chromium', browser: 'chromium', platform: 'ubuntu-22.04-arm' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build Docker image
         run: |
-          docker build -t urlapi .
+          docker build -f docker/Dockerfile.${{ matrix.browser }} -t urlapi .
+
+      - name: Who am I
+        run: |
+          docker run --rm -t -e ALLOW_HTTP=true urlapi bash -c 'echo "Using arch $(arch), browser at ${BROWSER_EXECUTABLE_PATH}" && $BROWSER_EXECUTABLE_PATH --version'
 
       - name: Run tests inside Docker container
         run: |
