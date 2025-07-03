@@ -7,7 +7,7 @@
     "node": "22.x.x"
   },
   "scripts": {
-    "start": "env-cmd nodemon --watch ./src -e js src/index.js",
+    "start": "env-cmd node .",
     "test": "mocha --timeout 30000 && npm run lint",
     "lint": "eslint ."
   },
@@ -44,7 +44,6 @@
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-plugin-import": "^2.7.0",
     "mocha": "^11.7.1",
-    "nodemon": "^1.12.1",
     "supertest": "^3.0.0"
   }
 }
