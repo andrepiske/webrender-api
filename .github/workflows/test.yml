@@ -7,43 +7,26 @@ on:
     branches:
       - '**'
 jobs:
-  test-chrome:
-    runs-on: ubuntu-latest
+  test:
+    name: Test using ${{ matrix.label }}
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        include:
+        - { label: 'Chrome', browser: 'chrome', platform: 'ubuntu-latest' }
+        - { label: 'Chromium', browser: 'chromium', platform: 'ubuntu-latest' }
+        - { label: 'ARM Chromium', browser: 'chromium', platform: 'ubuntu-22.04-arm' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build Docker image
         run: |
-          docker build -f docker/Dockerfile.chrome -t urlapi .
+          docker build -f docker/Dockerfile.${{ matrix.browser }} -t urlapi .
 
-      - name: Run tests inside Docker container
+      - name: Who am I
         run: |
-          docker run --rm -t -e ALLOW_HTTP=true urlapi bash -c 'npm install && npm run test'
-
-  test-chromium:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build Docker image
-        run: |
-          docker build -f docker/Dockerfile.chromium -t urlapi .
-
-      - name: Run tests inside Docker container
-        run: |
-          docker run --rm -t -e ALLOW_HTTP=true urlapi bash -c 'npm install && npm run test'
-
-  test-chromium-arm:
-    runs-on: ubuntu-22.04-arm
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build Docker image
-        run: |
-          docker build -f docker/Dockerfile.chromium -t urlapi .
+          docker run --rm -t -e ALLOW_HTTP=true urlapi bash -c 'echo "Using arch $(arch), browser at ${BROWSER_EXECUTABLE_PATH}" && $BROWSER_EXECUTABLE_PATH --version'
 
       - name: Run tests inside Docker container
         run: |
