@@ -8,8 +8,7 @@
   },
   "scripts": {
     "start": "env-cmd node .",
-    "test": "mocha --timeout 30000 --exit && npm run lint",
-    "lint": "eslint ."
+    "test": "mocha --timeout 30000 --exit"
   },
   "repository": {
     "type": "git",
@@ -36,13 +35,10 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
-    "pdf-parse": "^1.1.1",
-    "chai": "^4.1.2",
+    "chai": "^5.2.0",
     "env-cmd": "^9.0.1",
-    "eslint": "^4.8.0",
-    "eslint-config-airbnb-base": "^12.0.2",
-    "eslint-plugin-import": "^2.7.0",
     "mocha": "^11.7.1",
+    "pdf-parse": "^1.1.1",
     "supertest": "^7.1.1"
   }
 }
