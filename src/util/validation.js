@@ -1,11 +1,11 @@
-const { Joi } = require('express-validation')
+const { Joi } = require('express-validation');
 
 const urlSchema = Joi.string().uri({
   scheme: [
     'http',
     'https'
   ]
-})
+});
 
 const cookieSchema = Joi.object({
   name: Joi.string().required(),
@@ -17,7 +17,7 @@ const cookieSchema = Joi.object({
   httpOnly: Joi.boolean(),
   secure: Joi.boolean(),
   sameSite: Joi.string().regex(/^(Strict|Lax)$/)
-})
+});
 
 const sharedQuerySchema = Joi.object({
   attachmentName: Joi.string(),
@@ -63,11 +63,11 @@ const sharedQuerySchema = Joi.object({
   'screenshot.clip.height': Joi.number(),
   'screenshot.selector': Joi.string().regex(/(#|\.).*/),
   'screenshot.omitBackground': Joi.boolean()
-})
+});
 
 const renderQuerySchema = Joi.object({
   url: urlSchema.required()
-}).concat(sharedQuerySchema)
+}).concat(sharedQuerySchema);
 
 const renderBodyObject = Joi.object({
   url: urlSchema,
@@ -127,15 +127,15 @@ const renderBodyObject = Joi.object({
     omitBackground: Joi.boolean()
   }),
   failEarly: Joi.string()
-})
+});
 
 const renderBodySchema = Joi.alternatives([
   Joi.string(),
   renderBodyObject
-])
+]);
 
 module.exports = {
   renderQuerySchema,
   renderBodySchema,
   sharedQuerySchema
-}
+};

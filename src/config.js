@@ -15,14 +15,14 @@ const config = {
   BROWSER_EXECUTABLE_PATH: process.env.BROWSER_EXECUTABLE_PATH,
   API_TOKENS: [],
   ALLOW_URLS: []
-}
+};
 
 if (process.env.API_TOKENS) {
-  config.API_TOKENS = process.env.API_TOKENS.split(',')
+  config.API_TOKENS = process.env.API_TOKENS.split(',');
 }
 
 if (process.env.ALLOW_URLS) {
-  config.ALLOW_URLS = process.env.ALLOW_URLS.split(',')
+  config.ALLOW_URLS = process.env.ALLOW_URLS.split(',');
 }
 
-module.exports = config
+module.exports = config;

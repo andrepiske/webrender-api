@@ -1,10 +1,13 @@
 module.exports = {
   extends: 'standard',
   env: {
-    node: true, // Assuming this is a Node.js project
-    es2021: true // Or your target ECMAScript version
+    node: true,
+    es2021: true
   },
   rules: {
-    // You can add custom rules here if needed later
+    // We will add custom rules here later
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "never"],
+    "space-before-function-paren": ["error", "never"]
   }
-}
+};

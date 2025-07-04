@@ -1,43 +1,43 @@
 /* eslint-env mocha */
 
-const chai = require('chai')
-const fs = require('fs')
-const request = require('supertest')
-const BPromise = require('bluebird')
-const { getResource } = require('./util')
-const pdf = require('pdf-parse')
-const createApp = require('../src/app')
+const chai = require('chai');
+const fs = require('fs');
+const request = require('supertest');
+const BPromise = require('bluebird');
+const { getResource } = require('./util');
+const pdf = require('pdf-parse');
+const createApp = require('../src/app');
 
-const DEBUG = false
+const DEBUG = false;
 
 BPromise.config({
   longStackTraces: true
-})
+});
 
-const app = createApp()
+const app = createApp();
 
-function normalisePdfText (text) {
+function normalisePdfText(text) {
   // Replace all non-alphanumeric characters with a hyphen to resolve some difference in
   // character encoding when comparing strings extracted from the PDF and strings
   // defined in the test environment
-  return text.replace(/[\W_]+/g, '-')
+  return text.replace(/[\W_]+/g, '-');
 }
 
-function getPdfTextContent (buffer, opts = {}) {
+function getPdfTextContent(buffer, opts = {}) {
   return pdf(buffer)
     .then((data) => {
       if (opts.raw) {
-        return data.text
+        return data.text;
       }
 
-      return normalisePdfText(data.text)
-    })
+      return normalisePdfText(data.text);
+    });
 }
 
 describe('GET /api/render', () => {
   it('request must have "url" query parameter', () => {
-    request(app).get('/api/render').expect(400)
-  })
+    request(app).get('/api/render').expect(400);
+  });
 
   it('invalid cert should cause an error', () =>
     request(app)
@@ -46,7 +46,7 @@ describe('GET /api/render', () => {
         url: 'https://self-signed.badssl.com/'
       })
       .expect(500)
-  )
+  );
 
   it('invalid cert should not cause an error when ignoreHttpsErrors=true', () =>
     request(app)
@@ -56,8 +56,8 @@ describe('GET /api/render', () => {
         ignoreHttpsErrors: true
       })
       .expect(200)
-  )
-})
+  );
+});
 
 describe('POST /api/render', () => {
   it('body must have "url" attribute', () =>
@@ -68,7 +68,7 @@ describe('POST /api/render', () => {
       })
       .set('content-type', 'application/json')
       .expect(400)
-  )
+  );
 
   it('render google.com should succeed', () =>
     request(app)
@@ -79,10 +79,10 @@ describe('POST /api/render', () => {
       .expect(200)
       .expect('content-type', 'application/pdf')
       .then((response) => {
-        const length = Number(response.headers['content-length'])
-        chai.expect(length).to.be.above(1024 * 40)
+        const length = Number(response.headers['content-length']);
+        chai.expect(length).to.be.above(1024 * 40);
       })
-  )
+  );
 
   it('html in json body should succeed', () =>
     request(app)
@@ -93,10 +93,10 @@ describe('POST /api/render', () => {
       .expect(200)
       .expect('content-type', 'application/pdf')
       .then((response) => {
-        const length = Number(response.headers['content-length'])
-        chai.expect(length).to.be.above(1024 * 40)
+        const length = Number(response.headers['content-length']);
+        chai.expect(length).to.be.above(1024 * 40);
       })
-  )
+  );
 
   it('html as text body should succeed', () =>
     request(app)
@@ -107,10 +107,10 @@ describe('POST /api/render', () => {
       .expect(200)
       .expect('content-type', 'application/pdf')
       .then((response) => {
-        const length = Number(response.headers['content-length'])
-        chai.expect(length).to.be.above(1024 * 40)
+        const length = Number(response.headers['content-length']);
+        chai.expect(length).to.be.above(1024 * 40);
       })
-  )
+  );
 
   it('rendering large html should succeed', () =>
     request(app)
@@ -120,10 +120,10 @@ describe('POST /api/render', () => {
       .expect(200)
       .expect('content-type', 'application/pdf')
       .then((response) => {
-        const length = Number(response.headers['content-length'])
-        chai.expect(length).to.be.above(1024 * 1024 * 1)
+        const length = Number(response.headers['content-length']);
+        chai.expect(length).to.be.above(1024 * 1024 * 1);
       })
-  )
+  );
 
   it('rendering html with large linked images should succeed', () =>
     request(app)
@@ -134,15 +134,15 @@ describe('POST /api/render', () => {
       .expect('content-type', 'application/pdf')
       .then((response) => {
         if (DEBUG) {
-          console.log(response.headers)
-          console.log(response.body)
-          fs.writeFileSync('out.pdf', response.body, { encoding: null })
+          console.log(response.headers);
+          console.log(response.body);
+          fs.writeFileSync('out.pdf', response.body, { encoding: null });
         }
 
-        const length = Number(response.headers['content-length'])
-        chai.expect(length).to.be.above(30 * 1024 * 1)
+        const length = Number(response.headers['content-length']);
+        chai.expect(length).to.be.above(30 * 1024 * 1);
       })
-  )
+  );
 
   it('cookies should exist on the page', () =>
     request(app)
@@ -166,22 +166,22 @@ describe('POST /api/render', () => {
       .expect('content-type', 'application/pdf')
       .then((response) => {
         if (DEBUG) {
-          console.log(response.headers)
-          console.log(response.body)
-          fs.writeFileSync('cookies-pdf.pdf', response.body, { encoding: null })
+          console.log(response.headers);
+          console.log(response.body);
+          fs.writeFileSync('cookies-pdf.pdf', response.body, { encoding: null });
         }
 
-        return getPdfTextContent(response.body)
+        return getPdfTextContent(response.body);
       })
       .then((text) => {
         if (DEBUG) {
-          fs.writeFileSync('./cookies-content.txt', text)
+          fs.writeFileSync('./cookies-content.txt', text);
         }
 
-        chai.expect(text).to.have.string('url-to-pdf-test-test-successful')
-        chai.expect(text).to.have.string('url-to-pdf-test-2-test-successful-2')
+        chai.expect(text).to.have.string('url-to-pdf-test-test-successful');
+        chai.expect(text).to.have.string('url-to-pdf-test-2-test-successful-2');
       })
-  )
+  );
 
   it('special characters should be rendered correctly', () =>
     request(app)
@@ -193,23 +193,23 @@ describe('POST /api/render', () => {
       .expect('content-type', 'application/pdf')
       .then((response) => {
         if (DEBUG) {
-          console.log(response.headers)
-          console.log(response.body)
-          fs.writeFileSync('special-chars.pdf', response.body, { encoding: null })
+          console.log(response.headers);
+          console.log(response.body);
+          fs.writeFileSync('special-chars.pdf', response.body, { encoding: null });
         }
 
-        return getPdfTextContent(response.body, { raw: true })
+        return getPdfTextContent(response.body, { raw: true });
       })
       .then((text) => {
         if (DEBUG) {
-          fs.writeFileSync('./special-chars-content.txt', text)
+          fs.writeFileSync('./special-chars-content.txt', text);
         }
 
-        chai.expect(text).to.have.string('special characters: ä ö ü')
+        chai.expect(text).to.have.string('special characters: ä ö ü');
       })
-  )
-})
+  );
+});
 
 describe('GET /healthcheck', () => {
-  it('should return ok', () => request(app).get('/healthcheck').expect(200))
-})
+  it('should return ok', () => request(app).get('/healthcheck').expect(200));
+});
