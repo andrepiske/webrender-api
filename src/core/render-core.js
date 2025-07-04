@@ -1,20 +1,20 @@
-const puppeteer = require('puppeteer');
-const _ = require('lodash');
-const config = require('../config');
-const logger = require('../util/logger')(__filename);
+const puppeteer = require('puppeteer')
+const _ = require('lodash')
+const config = require('../config')
+const logger = require('../util/logger')(__filename)
 
-async function createBrowser(opts) {
+async function createBrowser (opts) {
   const browserOpts = {
     acceptInsecureCerts: opts.ignoreHttpsErrors,
-    sloMo: config.DEBUG_MODE ? 250 : undefined,
-  };
-  if (config.BROWSER_WS_ENDPOINT) {
-    browserOpts.browserWSEndpoint = config.BROWSER_WS_ENDPOINT;
-    return puppeteer.connect(browserOpts);
-  } else if (config.BROWSER_EXECUTABLE_PATH) {
-    browserOpts.executablePath = config.BROWSER_EXECUTABLE_PATH;
+    sloMo: config.DEBUG_MODE ? 250 : undefined
   }
-  browserOpts.headless = config.HEADLESS_MODE;
+  if (config.BROWSER_WS_ENDPOINT) {
+    browserOpts.browserWSEndpoint = config.BROWSER_WS_ENDPOINT
+    return puppeteer.connect(browserOpts)
+  } else if (config.BROWSER_EXECUTABLE_PATH) {
+    browserOpts.executablePath = config.BROWSER_EXECUTABLE_PATH
+  }
+  browserOpts.headless = config.HEADLESS_MODE
   browserOpts.args = [
     '--no-sandbox',
     '--disable-setuid-sandbox',
@@ -27,27 +27,27 @@ async function createBrowser(opts) {
     '--disable-features=VizDisplayCompositor',
     '--disable-features=InterestFeedContentSuggestions',
     '--disable-features=Translate',
-    '--no-default-browser-check',
-  ];
+    '--no-default-browser-check'
+  ]
 
-  return puppeteer.launch(browserOpts);
+  return puppeteer.launch(browserOpts)
 }
 
-async function getFullPageHeight(page) {
+async function getFullPageHeight (page) {
   const height = await page.evaluate(() => {
-    const { body, documentElement } = document;
+    const { body, documentElement } = document
     return Math.max(
       body.scrollHeight,
       body.offsetHeight,
       documentElement.clientHeight,
       documentElement.scrollHeight,
       documentElement.offsetHeight
-    );
-  });
-  return height;
+    )
+  })
+  return height
 }
 
-async function render(_opts = {}) {
+async function render (_opts = {}) {
   const opts = _.merge({
     cookies: [],
     scrollPage: false,
@@ -56,224 +56,224 @@ async function render(_opts = {}) {
     html: null,
     viewport: {
       width: 1600,
-      height: 1200,
+      height: 1200
     },
     goto: {
-      waitUntil: 'networkidle0',
+      waitUntil: 'networkidle0'
     },
     output: 'pdf',
     pdf: {
       format: 'A4',
-      printBackground: true,
+      printBackground: true
     },
     screenshot: {
       type: 'png',
-      fullPage: true,
+      fullPage: true
     },
-    failEarly: false,
-  }, _opts);
+    failEarly: false
+  }, _opts)
 
   if ((_.get(_opts, 'pdf.width') && _.get(_opts, 'pdf.height')) || _.get(opts, 'pdf.fullPage')) {
     // pdf.format always overrides width and height, so we must delete it
     // when user explicitly wants to set width and height
-    opts.pdf.format = undefined;
+    opts.pdf.format = undefined
   }
 
-  logOpts(opts);
+  logOpts(opts)
 
-  const browser = await createBrowser(opts);
-  logger.info(`Browser version: ${await browser.version()}`);
-  logger.info(`Browser UA: ${await browser.userAgent()}`);
+  const browser = await createBrowser(opts)
+  logger.info(`Browser version: ${await browser.version()}`)
+  logger.info(`Browser UA: ${await browser.userAgent()}`)
 
-  const page = await browser.newPage();
-  page.setDefaultNavigationTimeout(60000); // 60 seconds
-  page.setDefaultTimeout(60000);
+  const page = await browser.newPage()
+  page.setDefaultNavigationTimeout(60000) // 60 seconds
+  page.setDefaultTimeout(60000)
 
   page.on('console', (msg) => {
-    let loc = msg.location();
+    let loc = msg.location()
     if (loc) {
-      loc = `${loc.url}:${loc.lineNumber}:${loc.columnNumber}`;
+      loc = `${loc.url}:${loc.lineNumber}:${loc.columnNumber}`
     }
-    logger.info(`PAGE LOG (${loc}): `, msg.text());
-  });
+    logger.info(`PAGE LOG (${loc}): `, msg.text())
+  })
 
   page.on('error', (err) => {
-    logger.error(`Error event emitted: ${err}`);
-    logger.error(err.stack);
-    browser.close();
-  });
+    logger.error(`Error event emitted: ${err}`)
+    logger.error(err.stack)
+    browser.close()
+  })
 
-  this.failedResponses = [];
+  this.failedResponses = []
   page.on('requestfailed', (request) => {
-    this.failedResponses.push(request);
+    this.failedResponses.push(request)
     if (request.url === opts.url) {
-      this.mainUrlResponse = request;
+      this.mainUrlResponse = request
     }
-  });
+  })
 
   page.on('response', (response) => {
     if (response.status >= 400) {
-      this.failedResponses.push(response);
+      this.failedResponses.push(response)
     }
 
     if (response.url === opts.url) {
-      this.mainUrlResponse = response;
+      this.mainUrlResponse = response
     }
-  });
+  })
 
-  let data;
+  let data
   try {
-    logger.info('Set browser viewport..');
-    await page.setViewport(opts.viewport);
+    logger.info('Set browser viewport..')
+    await page.setViewport(opts.viewport)
     if (opts.emulateScreenMedia) {
-      logger.info('Emulate @media screen..');
-      await page.emulateMediaType('screen');
+      logger.info('Emulate @media screen..')
+      await page.emulateMediaType('screen')
     }
 
     if (opts.cookies && opts.cookies.length > 0) {
-      logger.info('Setting cookies..');
+      logger.info('Setting cookies..')
 
-      const client = await page.target().createCDPSession();
+      const client = await page.target().createCDPSession()
 
-      await client.send('Network.enable');
-      await client.send('Network.setCookies', { cookies: opts.cookies });
+      await client.send('Network.enable')
+      await client.send('Network.setCookies', { cookies: opts.cookies })
     }
 
     if (_.isString(opts.html)) {
-      logger.info('Set HTML ..');
-      await page.setContent(opts.html, opts.goto);
+      logger.info('Set HTML ..')
+      await page.setContent(opts.html, opts.goto)
     } else {
-      logger.info(`Goto url ${opts.url} ..`);
-      await page.goto(opts.url, opts.goto);
+      logger.info(`Goto url ${opts.url} ..`)
+      await page.goto(opts.url, opts.goto)
     }
 
-    logger.info('html is set!');
+    logger.info('html is set!')
     if (_.isNumber(opts.waitFor)) {
-      const time = parseInt(opts.waitFor, 10);
-      logger.info(`Wait for ${time}ms ..`);
-      await (async () => new Promise(resolve => setTimeout(resolve, time)))();
+      const time = parseInt(opts.waitFor, 10)
+      logger.info(`Wait for ${time}ms ..`)
+      await (async () => new Promise(resolve => setTimeout(resolve, time)))()
     } else if (_.isString(opts.waitFor)) {
-      logger.info(`Wait for ${opts.waitFor} ..`);
-      await page.waitForSelector(opts.waitFor);
+      logger.info(`Wait for ${opts.waitFor} ..`)
+      await page.waitForSelector(opts.waitFor)
     }
 
     if (opts.scrollPage) {
-      logger.info('Scroll page ..');
-      await scrollPage(page);
+      logger.info('Scroll page ..')
+      await scrollPage(page)
     }
 
     if (this.failedResponses.length) {
-      logger.warn(`Number of failed requests: ${this.failedResponses.length}`);
+      logger.warn(`Number of failed requests: ${this.failedResponses.length}`)
       this.failedResponses.forEach((response) => {
         try {
-          logger.warn(`${response._response.status()} ${response.url()}`);
+          logger.warn(`${response._response.status()} ${response.url()}`)
         } catch (e) {
-          logger.warn(`Failed to log response: ${e}`);
+          logger.warn(`Failed to log response: ${e}`)
         }
-      });
+      })
 
       if (opts.failEarly === 'all') {
-        const err = new Error(`${this.failedResponses.length} requests have failed. See server log for more details.`);
-        err.status = 412;
-        throw err;
+        const err = new Error(`${this.failedResponses.length} requests have failed. See server log for more details.`)
+        err.status = 412
+        throw err
       }
     }
     if (opts.failEarly === 'page' && this.mainUrlResponse.status !== 200) {
-      const msg = `Request for ${opts.url} did not directly succeed and returned status ${this.mainUrlResponse.status}`;
-      const err = new Error(msg);
-      err.status = 412;
-      throw err;
+      const msg = `Request for ${opts.url} did not directly succeed and returned status ${this.mainUrlResponse.status}`
+      const err = new Error(msg)
+      err.status = 412
+      throw err
     }
 
-    logger.info('Rendering ..');
+    logger.info('Rendering ..')
     if (config.DEBUG_MODE) {
       const msg = `\n\n---------------------------------\n
         Chrome does not support rendering in "headed" mode.
         See this issue: https://github.com/GoogleChrome/puppeteer/issues/576
         \n---------------------------------\n\n
-      `;
-      throw new Error(msg);
+      `
+      throw new Error(msg)
     }
 
     if (opts.output === 'pdf') {
       if (opts.pdf.fullPage) {
-        const height = await getFullPageHeight(page);
-        opts.pdf.height = height;
+        const height = await getFullPageHeight(page)
+        opts.pdf.height = height
       }
-      data = await page.pdf(opts.pdf);
+      data = await page.pdf(opts.pdf)
     } else if (opts.output === 'html') {
-      data = await page.evaluate(() => document.documentElement.innerHTML);
+      data = await page.evaluate(() => document.documentElement.innerHTML)
     } else {
       // This is done because puppeteer throws an error if fullPage and clip is used at the same
       // time even though clip is just empty object {}
-      const screenshotOpts = _.cloneDeep(_.omit(opts.screenshot, ['clip']));
-      const clipContainsSomething = _.some(opts.screenshot.clip, val => !_.isUndefined(val));
+      const screenshotOpts = _.cloneDeep(_.omit(opts.screenshot, ['clip']))
+      const clipContainsSomething = _.some(opts.screenshot.clip, val => !_.isUndefined(val))
       if (clipContainsSomething) {
-        screenshotOpts.clip = opts.screenshot.clip;
+        screenshotOpts.clip = opts.screenshot.clip
       }
       if (_.isNil(opts.screenshot.selector)) {
-        data = await page.screenshot(screenshotOpts);
+        data = await page.screenshot(screenshotOpts)
       } else {
-        const selElement = await page.$(opts.screenshot.selector);
-        const selectorScreenOpts = _.cloneDeep(_.omit(screenshotOpts, ['selector', 'fullPage']));
+        const selElement = await page.$(opts.screenshot.selector)
+        const selectorScreenOpts = _.cloneDeep(_.omit(screenshotOpts, ['selector', 'fullPage']))
         if (!_.isNull(selElement)) {
-          data = await selElement.screenshot(selectorScreenOpts);
+          data = await selElement.screenshot(selectorScreenOpts)
         }
       }
     }
   } catch (err) {
-    logger.error(`Error when rendering page: ${err}`);
-    logger.error(err.stack);
-    throw err;
+    logger.error(`Error when rendering page: ${err}`)
+    logger.error(err.stack)
+    throw err
   } finally {
-    logger.info('Closing browser..');
+    logger.info('Closing browser..')
     if (!config.DEBUG_MODE) {
-      await browser.close();
+      await browser.close()
     }
   }
 
-  return data;
+  return data
 }
 
-async function scrollPage(page) {
+async function scrollPage (page) {
   // Scroll to page end to trigger lazy loading elements
   await page.evaluate(() => {
-    const scrollInterval = 100;
-    const scrollStep = Math.floor(window.innerHeight / 2);
-    const bottomThreshold = 400;
+    const scrollInterval = 100
+    const scrollStep = Math.floor(window.innerHeight / 2)
+    const bottomThreshold = 400
 
-    function bottomPos() {
-      return window.pageYOffset + window.innerHeight;
+    function bottomPos () {
+      return window.pageYOffset + window.innerHeight
     }
 
     return new Promise((resolve, reject) => {
-      function scrollDown() {
-        window.scrollBy(0, scrollStep);
+      function scrollDown () {
+        window.scrollBy(0, scrollStep)
 
         if (document.body.scrollHeight - bottomPos() < bottomThreshold) {
-          window.scrollTo(0, 0);
-          setTimeout(resolve, 500);
-          return;
+          window.scrollTo(0, 0)
+          setTimeout(resolve, 500)
+          return
         }
 
-        setTimeout(scrollDown, scrollInterval);
+        setTimeout(scrollDown, scrollInterval)
       }
 
-      setTimeout(reject, 30000);
-      scrollDown();
-    });
-  });
+      setTimeout(reject, 30000)
+      scrollDown()
+    })
+  })
 }
 
-function logOpts(opts) {
-  const supressedOpts = _.cloneDeep(opts);
+function logOpts (opts) {
+  const supressedOpts = _.cloneDeep(opts)
   if (opts.html) {
-    supressedOpts.html = '...';
+    supressedOpts.html = '...'
   }
 
-  logger.info(`Rendering with opts: ${JSON.stringify(supressedOpts, null, 2)}`);
+  logger.info(`Rendering with opts: ${JSON.stringify(supressedOpts, null, 2)}`)
 }
 
 module.exports = {
-  render,
-};
+  render
+}
