@@ -38,7 +38,7 @@ function createApp() {
 
   const corsOpts = {
     origin: config.CORS_ORIGIN,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH']
   };
   logger.info('Using CORS options:', corsOpts);
   app.use(cors(corsOpts));
@@ -49,7 +49,7 @@ function createApp() {
 
   app.use(compression({
     // Compress everything over 10 bytes
-    threshold: 10,
+    threshold: 10
   }));
 
   // Initialize routes

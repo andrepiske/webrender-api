@@ -12,8 +12,8 @@ function createLogger(filePath) {
     transports: [new winston.transports.Console({
       colorize: COLORIZE,
       label: fileName,
-      timestamp: true,
-    })],
+      timestamp: true
+    })]
   });
 
   _setLevelForTransports(logger, config.LOG_LEVEL || 'info');

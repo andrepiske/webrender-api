@@ -7,5 +7,5 @@ function getResource(name) {
 }
 
 module.exports = {
-  getResource,
+  getResource
 };

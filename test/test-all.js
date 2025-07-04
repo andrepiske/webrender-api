@@ -11,7 +11,7 @@ const createApp = require('../src/app');
 const DEBUG = false;
 
 BPromise.config({
-  longStackTraces: true,
+  longStackTraces: true
 });
 
 const app = createApp();
@@ -43,7 +43,7 @@ describe('GET /api/render', () => {
     request(app)
       .get('/api/render')
       .query({
-        url: 'https://self-signed.badssl.com/',
+        url: 'https://self-signed.badssl.com/'
       })
       .expect(500)
   );
@@ -53,7 +53,7 @@ describe('GET /api/render', () => {
       .get('/api/render')
       .query({
         url: 'https://self-signed.badssl.com/',
-        ignoreHttpsErrors: true,
+        ignoreHttpsErrors: true
       })
       .expect(200)
   );
@@ -64,7 +64,7 @@ describe('POST /api/render', () => {
     request(app)
       .post('/api/render')
       .send({
-        pdf: { scale: 2 },
+        pdf: { scale: 2 }
       })
       .set('content-type', 'application/json')
       .expect(400)
@@ -153,12 +153,12 @@ describe('POST /api/render', () => {
               [{
                 name: 'url-to-pdf-test',
                 value: 'test successful',
-                domain: 'httpbingo.org',
+                domain: 'httpbingo.org'
               }, {
                 name: 'url-to-pdf-test-2',
                 value: 'test successful 2',
-                domain: 'httpbingo.org',
-              }],
+                domain: 'httpbingo.org'
+              }]
       })
       .set('Connection', 'keep-alive')
       .set('content-type', 'application/json')

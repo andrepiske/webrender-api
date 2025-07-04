@@ -3,8 +3,8 @@ const { Joi } = require('express-validation');
 const urlSchema = Joi.string().uri({
   scheme: [
     'http',
-    'https',
-  ],
+    'https'
+  ]
 });
 
 const cookieSchema = Joi.object({
@@ -16,7 +16,7 @@ const cookieSchema = Joi.object({
   expires: Joi.number().min(1),
   httpOnly: Joi.boolean(),
   secure: Joi.boolean(),
-  sameSite: Joi.string().regex(/^(Strict|Lax)$/),
+  sameSite: Joi.string().regex(/^(Strict|Lax)$/)
 });
 
 const sharedQuerySchema = Joi.object({
@@ -27,7 +27,7 @@ const sharedQuerySchema = Joi.object({
   ignoreHttpsErrors: Joi.boolean(),
   waitFor: Joi.alternatives([
     Joi.number().min(1).max(60000),
-    Joi.string().min(1).max(2000),
+    Joi.string().min(1).max(2000)
   ]),
   cookies: Joi.array().items(cookieSchema),
   output: Joi.string().valid('pdf', 'screenshot', 'html'),
@@ -62,11 +62,11 @@ const sharedQuerySchema = Joi.object({
   'screenshot.clip.width': Joi.number(),
   'screenshot.clip.height': Joi.number(),
   'screenshot.selector': Joi.string().regex(/(#|\.).*/),
-  'screenshot.omitBackground': Joi.boolean(),
+  'screenshot.omitBackground': Joi.boolean()
 });
 
 const renderQuerySchema = Joi.object({
-  url: urlSchema.required(),
+  url: urlSchema.required()
 }).concat(sharedQuerySchema);
 
 const renderBodyObject = Joi.object({
@@ -84,15 +84,15 @@ const renderBodyObject = Joi.object({
     deviceScaleFactor: Joi.number().min(0).max(100),
     isMobile: Joi.boolean(),
     hasTouch: Joi.boolean(),
-    isLandscape: Joi.boolean(),
+    isLandscape: Joi.boolean()
   }),
   waitFor: Joi.alternatives([
     Joi.number().min(1).max(60000),
-    Joi.string().min(1).max(2000),
+    Joi.string().min(1).max(2000)
   ]),
   goto: Joi.object({
     timeout: Joi.number().min(0).max(60000),
-    waitUntil: Joi.string().min(1).max(2000),
+    waitUntil: Joi.string().min(1).max(2000)
   }),
   pdf: Joi.object({
     scale: Joi.number().min(0).max(1000),
@@ -109,9 +109,9 @@ const renderBodyObject = Joi.object({
       top: Joi.string().min(1).max(2000),
       right: Joi.string().min(1).max(2000),
       bottom: Joi.string().min(1).max(2000),
-      left: Joi.string().min(1).max(2000),
+      left: Joi.string().min(1).max(2000)
     }),
-    printBackground: Joi.boolean(),
+    printBackground: Joi.boolean()
   }),
   screenshot: Joi.object({
     fullPage: Joi.boolean(),
@@ -121,21 +121,21 @@ const renderBodyObject = Joi.object({
       x: Joi.number(),
       y: Joi.number(),
       width: Joi.number(),
-      height: Joi.number(),
+      height: Joi.number()
     },
     selector: Joi.string().regex(/(#|\.).*/),
-    omitBackground: Joi.boolean(),
+    omitBackground: Joi.boolean()
   }),
-  failEarly: Joi.string(),
+  failEarly: Joi.string()
 });
 
 const renderBodySchema = Joi.alternatives([
   Joi.string(),
-  renderBodyObject,
+  renderBodyObject
 ]);
 
 module.exports = {
   renderQuerySchema,
   renderBodySchema,
-  sharedQuerySchema,
+  sharedQuerySchema
 };

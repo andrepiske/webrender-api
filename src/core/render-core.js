@@ -6,7 +6,7 @@ const logger = require('../util/logger')(__filename);
 async function createBrowser(opts) {
   const browserOpts = {
     acceptInsecureCerts: opts.ignoreHttpsErrors,
-    sloMo: config.DEBUG_MODE ? 250 : undefined,
+    sloMo: config.DEBUG_MODE ? 250 : undefined
   };
   if (config.BROWSER_WS_ENDPOINT) {
     browserOpts.browserWSEndpoint = config.BROWSER_WS_ENDPOINT;
@@ -27,7 +27,7 @@ async function createBrowser(opts) {
     '--disable-features=VizDisplayCompositor',
     '--disable-features=InterestFeedContentSuggestions',
     '--disable-features=Translate',
-    '--no-default-browser-check',
+    '--no-default-browser-check'
   ];
 
   return puppeteer.launch(browserOpts);
@@ -56,21 +56,21 @@ async function render(_opts = {}) {
     html: null,
     viewport: {
       width: 1600,
-      height: 1200,
+      height: 1200
     },
     goto: {
-      waitUntil: 'networkidle0',
+      waitUntil: 'networkidle0'
     },
     output: 'pdf',
     pdf: {
       format: 'A4',
-      printBackground: true,
+      printBackground: true
     },
     screenshot: {
       type: 'png',
-      fullPage: true,
+      fullPage: true
     },
-    failEarly: false,
+    failEarly: false
   }, _opts);
 
   if ((_.get(_opts, 'pdf.width') && _.get(_opts, 'pdf.height')) || _.get(opts, 'pdf.fullPage')) {
@@ -151,7 +151,7 @@ async function render(_opts = {}) {
     if (_.isNumber(opts.waitFor)) {
       const time = parseInt(opts.waitFor, 10);
       logger.info(`Wait for ${time}ms ..`);
-      await (async () => new Promise(resolve => setTimeout(resolve, time)))();
+      await (async() => new Promise(resolve => setTimeout(resolve, time)))();
     } else if (_.isString(opts.waitFor)) {
       logger.info(`Wait for ${opts.waitFor} ..`);
       await page.waitForSelector(opts.waitFor);
@@ -275,5 +275,5 @@ function logOpts(opts) {
 }
 
 module.exports = {
-  render,
+  render
 };

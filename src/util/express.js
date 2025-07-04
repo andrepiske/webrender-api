@@ -53,5 +53,5 @@ function throwStatus(status, message) {
 module.exports = {
   createRoute,
   createJsonRoute,
-  throwStatus,
+  throwStatus
 };

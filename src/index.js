@@ -6,7 +6,7 @@ const config = require('./config');
 
 BPromise.config({
   warnings: config.NODE_ENV !== 'production',
-  longStackTraces: true,
+  longStackTraces: true
 });
 
 const app = createApp();

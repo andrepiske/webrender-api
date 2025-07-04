@@ -31,7 +31,7 @@ function createRouter() {
 
   const postRenderSchema = {
     body: renderBodySchema,
-    query: sharedQuerySchema,
+    query: sharedQuerySchema
   };
   router.post('/api/render', validate(postRenderSchema), render.postRender);
 

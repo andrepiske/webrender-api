@@ -6,7 +6,7 @@ const SLICE_THRESHOLD = 1000;
 function createErrorLogger(_opts) {
   const opts = _.merge({
     logRequest: status => status >= 400 && status !== 404 && status !== 503,
-    logStackTrace: status => status >= 500 && status !== 503,
+    logStackTrace: status => status >= 500 && status !== 503
   }, _opts);
 
   return function errorHandler(err, req, res, next) {

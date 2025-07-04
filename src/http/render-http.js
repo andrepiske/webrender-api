@@ -51,8 +51,8 @@ const postRender = ex.createRoute((req, res) => {
     opts = _.merge({
       output: 'pdf',
       screenshot: {
-        type: 'png',
-      },
+        type: 'png'
+      }
     }, req.body);
   } else {
     opts = getOptsFromQuery(req.query);
@@ -75,7 +75,7 @@ function isHostMatch(host1, host2) {
     match: host1.toLowerCase() === host2.toLowerCase(),
     type: 'host',
     part1: host1.toLowerCase(),
-    part2: host2.toLowerCase(),
+    part2: host2.toLowerCase()
   };
 }
 
@@ -86,7 +86,7 @@ function isRegexMatch(urlPattern, inputUrl) {
     match: re.test(inputUrl),
     type: 'regex',
     part1: inputUrl,
-    part2: urlPattern,
+    part2: urlPattern
   };
 }
 
@@ -95,7 +95,7 @@ function isNormalizedMatch(url1, url2) {
     match: normalizeUrl(url1) === normalizeUrl(url2),
     type: 'normalized url',
     part1: url1,
-    part2: url2,
+    part2: url2
   };
 }
 
@@ -150,11 +150,11 @@ function getOptsFromQuery(query) {
       deviceScaleFactor: query['viewport.deviceScaleFactor'],
       isMobile: query['viewport.isMobile'],
       hasTouch: query['viewport.hasTouch'],
-      isLandscape: query['viewport.isLandscape'],
+      isLandscape: query['viewport.isLandscape']
     },
     goto: {
       timeout: query['goto.timeout'],
-      waitUntil: query['goto.waitUntil'],
+      waitUntil: query['goto.waitUntil']
     },
     pdf: {
       fullPage: query['pdf.fullPage'],
@@ -171,9 +171,9 @@ function getOptsFromQuery(query) {
         top: query['pdf.margin.top'],
         right: query['pdf.margin.right'],
         bottom: query['pdf.margin.bottom'],
-        left: query['pdf.margin.left'],
+        left: query['pdf.margin.left']
       },
-      printBackground: query['pdf.printBackground'],
+      printBackground: query['pdf.printBackground']
     },
     screenshot: {
       fullPage: query['screenshot.fullPage'],
@@ -183,16 +183,16 @@ function getOptsFromQuery(query) {
         x: query['screenshot.clip.x'],
         y: query['screenshot.clip.y'],
         width: query['screenshot.clip.width'],
-        height: query['screenshot.clip.height'],
+        height: query['screenshot.clip.height']
       },
       selector: query['screenshot.selector'],
-      omitBackground: query['screenshot.omitBackground'],
-    },
+      omitBackground: query['screenshot.omitBackground']
+    }
   };
   return opts;
 }
 
 module.exports = {
   getRender,
-  postRender,
+  postRender
 };
