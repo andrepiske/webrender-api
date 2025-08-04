@@ -38,6 +38,6 @@
     "chai": "^5.2.0",
     "mocha": "^11.7.1",
     "pdf-parse": "^1.1.1",
-    "supertest": "^7.1.1"
+    "supertest": "^7.1.4"
   }
 }
