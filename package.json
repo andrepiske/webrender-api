@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node .",
-    "test": "mocha --timeout 30000 --exit"
+    "test": "mocha --timeout 30000 --exit",
+    "check": "npx biome check"
   },
   "repository": {
     "type": "git",

@@ -7,6 +7,25 @@ on:
     branches:
       - '**'
 jobs:
+  biome-check:
+    name: Run biome checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Check
+        run: npm run check
+
   test:
     name: Test using ${{ matrix.label }}
     runs-on: ${{ matrix.platform }}
