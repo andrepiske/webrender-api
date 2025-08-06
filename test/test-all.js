@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 
 const chai = require('chai');
-const fs = require('fs');
+const fs = require('node:fs');
 const request = require('supertest');
 const BPromise = require('bluebird');
 const { getResource } = require('./util');

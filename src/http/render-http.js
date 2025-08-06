@@ -1,4 +1,4 @@
-const { URL } = require('url');
+const { URL } = require('node:url');
 const _ = require('lodash');
 const normalizeUrl = require('normalize-url');
 const ex = require('../util/express');

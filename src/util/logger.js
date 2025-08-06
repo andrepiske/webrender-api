@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const winston = require('winston');
 const _ = require('lodash');
 const config = require('../config');

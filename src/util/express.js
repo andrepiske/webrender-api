@@ -4,7 +4,7 @@ const BPromise = require('bluebird');
 // Route which assumes that the Promise `func` returns, will be resolved
 // with data which will be sent as json response.
 function createJsonRoute(func) {
-  return createRoute(func, (data, req, res) => {
+  return createRoute(func, (data, _req, res) => {
     res.json(data);
   });
 }
