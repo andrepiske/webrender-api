@@ -4,7 +4,11 @@ const express = require('express');
 const render = require('./http/render-http');
 const config = require('./config');
 const logger = require('./util/logger')(__filename);
-const { renderQuerySchema, renderBodySchema, sharedQuerySchema } = require('./util/validation');
+const {
+  renderQuerySchema,
+  renderBodySchema,
+  sharedQuerySchema,
+} = require('./util/validation');
 
 function createRouter() {
   const router = express.Router();

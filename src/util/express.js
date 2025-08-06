@@ -33,7 +33,7 @@ function createRoute(func, responseHandler) {
 
       if (_.isFunction(responseHandler)) {
         valuePromise
-          .then(data => responseHandler(data, req, res, next))
+          .then((data) => responseHandler(data, req, res, next))
           .catch(next);
       } else {
         valuePromise.catch(next);

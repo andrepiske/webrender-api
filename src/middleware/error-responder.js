@@ -5,9 +5,12 @@ const _ = require('lodash');
 // with their .message attribute.
 // DO NOT write sensitive data into error messages.
 function createErrorResponder(_opts) {
-  const opts = _.merge({
-    isErrorSafeToRespond: status => status < 500,
-  }, _opts);
+  const opts = _.merge(
+    {
+      isErrorSafeToRespond: (status) => status < 500,
+    },
+    _opts,
+  );
 
   // 4 params needed for Express to know it's a error handler middleware
   // eslint-disable-next-line

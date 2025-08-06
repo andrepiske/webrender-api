@@ -15,7 +15,7 @@ const server = app.listen(config.PORT, config.HOST, () => {
     'Express server listening on http://%s:%d/ in %s mode',
     config.HOST,
     config.PORT,
-    app.get('env')
+    app.get('env'),
   );
 });
 enableDestroy(server);
