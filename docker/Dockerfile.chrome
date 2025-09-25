@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-ENV NODE_VERSION=22.17.0
+ENV NODE_VERSION=22.20.0
 ENV NODE_MAJOR=22
 RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
@@ -27,7 +27,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     node --version && npm --version && yarn --version
 
 # Install google chrome
-ARG GOOGLE_CHROME_VERSION=138.0.7204.183-1
+ARG GOOGLE_CHROME_VERSION=140.0.7339.207-1
 RUN set -eux ; \
     apt-get update -y \
     && curl -Lo /tmp/google-chrome.deb "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${GOOGLE_CHROME_VERSION}_amd64.deb" \
