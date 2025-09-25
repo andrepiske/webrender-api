@@ -4,7 +4,11 @@ const express = require('express');
 const render = require('./http/render-http');
 const config = require('./config');
 const logger = require('./util/logger')(__filename);
-const { renderQuerySchema, renderBodySchema, sharedQuerySchema } = require('./util/validation');
+const {
+  renderQuerySchema,
+  renderBodySchema,
+  sharedQuerySchema,
+} = require('./util/validation');
 
 function createRouter() {
   const router = express.Router();
@@ -12,7 +16,7 @@ function createRouter() {
   if (!_.isEmpty(config.API_TOKENS)) {
     logger.info('x-api-key authentication required');
 
-    router.use('/*', (req, res, next) => {
+    router.use('/*', (req, _res, next) => {
       const userToken = req.headers['x-api-key'];
       if (!_.includes(config.API_TOKENS, userToken)) {
         const err = new Error('Invalid API token in x-api-key header.');
@@ -35,7 +39,7 @@ function createRouter() {
   };
   router.post('/api/render', validate(postRenderSchema), render.postRender);
 
-  router.get('/healthcheck', (req, res) => res.status(200).send('OK'));
+  router.get('/healthcheck', (_req, res) => res.status(200).send('OK'));
 
   return router;
 }
