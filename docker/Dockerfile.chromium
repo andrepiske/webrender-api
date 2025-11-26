@@ -26,25 +26,7 @@ RUN mkdir -p /etc/apt/keyrings && \
     # smoke tests
     node --version && npm --version && yarn --version
 
-# Install Chromium
-# ARG CHROMIUM_VERSION="latest"
-ARG CHROMIUM_VERSION="140.0.7339.185"
-ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
-RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
-  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
-  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
-  && apt-get update -qqy \
-  && if [ "${CHROMIUM_VERSION}" = "latest" ]; \
-      then apt-get -y --no-install-recommends install chromium-common chromium chromium-l10n ; \
-     else mkdir -p /tmp/chromium \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-common_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-common.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-l10n_${CHROMIUM_VERSION}-1_all.deb -o /tmp/chromium/chromium-l10n.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-driver_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-driver.deb \
-      && apt-get -qqyf install /tmp/chromium/chromium-common.deb /tmp/chromium/chromium.deb /tmp/chromium/chromium-l10n.deb /tmp/chromium/chromium-driver.deb \
-      && rm -rf /tmp/chromium; \
-    fi \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+RUN apt-get update && apt-get install -y --no-install-recommends chromium && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 ENV BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true
