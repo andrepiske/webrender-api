@@ -12,22 +12,22 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 
 ENV NODE_VERSION=22.21.1
 ENV NODE_MAJOR=22
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    echo "Package: nodejs" | tee /etc/apt/preferences.d/nodejs > /dev/null && \
-    echo "Pin: origin deb.nodesource.com" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
-    echo "Pin-Priority: 600" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
-    apt-get update -y && \
-    apt-get install -y --no-install-recommends nodejs=${NODE_VERSION}-1nodesource1 && \
-    rm -rf /var/lib/apt/lists/* ; \
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "${ARCH}" in \
+      amd64) NODE_ARCH='x64';; \
+      arm64) NODE_ARCH='arm64';; \
+      *) echo "Unsupported architecture: ${ARCH}"; exit 1;; \
+    esac; \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz" \
+      | tar -xz -C /usr/local --strip-components=1 --no-same-owner; \
     corepack enable && \
     npm i -g npm && \
     # smoke tests
     node --version && npm --version && yarn --version
 
 # Install google chrome
-ARG GOOGLE_CHROME_VERSION=140.0.7339.207-1
+ARG GOOGLE_CHROME_VERSION=142.0.7444.175-1
 RUN set -eux ; \
     apt-get update -y \
     && curl -Lo /tmp/google-chrome.deb "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${GOOGLE_CHROME_VERSION}_amd64.deb" \

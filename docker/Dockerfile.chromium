@@ -5,22 +5,22 @@ ENV LANG=C.UTF-8
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
-      # gnupg is required to install Node
+      # gnupg is required to install Chromium
       gnupg \
     ; \
     rm -rf /var/lib/apt/lists/*
 
 ENV NODE_VERSION=22.21.1
 ENV NODE_MAJOR=22
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    echo "Package: nodejs" | tee /etc/apt/preferences.d/nodejs > /dev/null && \
-    echo "Pin: origin deb.nodesource.com" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
-    echo "Pin-Priority: 600" | tee -a /etc/apt/preferences.d/nodejs > /dev/null && \
-    apt-get update -y && \
-    apt-get install -y --no-install-recommends nodejs=${NODE_VERSION}-1nodesource1 && \
-    rm -rf /var/lib/apt/lists/* ; \
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "${ARCH}" in \
+      amd64) NODE_ARCH='x64';; \
+      arm64) NODE_ARCH='arm64';; \
+      *) echo "Unsupported architecture: ${ARCH}"; exit 1;; \
+    esac; \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz" \
+      | tar -xz -C /usr/local --strip-components=1 --no-same-owner; \
     corepack enable && \
     npm i -g npm && \
     # smoke tests
@@ -28,7 +28,7 @@ RUN mkdir -p /etc/apt/keyrings && \
 
 # Install Chromium
 # ARG CHROMIUM_VERSION="latest"
-ARG CHROMIUM_VERSION="140.0.7339.185"
+ARG CHROMIUM_VERSION="142.0.7444.175"
 ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
 RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
   && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
