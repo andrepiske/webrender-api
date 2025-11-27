@@ -23,7 +23,7 @@
   "homepage": "https://github.com/alvarcarto/url-to-pdf-api#readme",
   "dependencies": {
     "bluebird": "^3.7.2",
-    "body-parser": "^2.2.0",
+    "body-parser": "^2.2.1",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
