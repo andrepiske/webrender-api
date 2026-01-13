@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-ENV NODE_VERSION=22.21.1
+ENV NODE_VERSION=22.22.0
 ENV NODE_MAJOR=22
 RUN set -eux; \
     ARCH="$(dpkg --print-architecture)"; \
@@ -28,7 +28,7 @@ RUN set -eux; \
 
 # Install Chromium
 # ARG CHROMIUM_VERSION="latest"
-ARG CHROMIUM_VERSION="142.0.7444.175"
+ARG CHROMIUM_VERSION="143.0.7499.192"
 ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
 RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
   && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
