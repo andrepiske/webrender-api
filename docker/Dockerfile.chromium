@@ -28,7 +28,7 @@ RUN set -eux; \
 
 # Install Chromium
 # ARG CHROMIUM_VERSION="latest"
-ARG CHROMIUM_VERSION="143.0.7499.192"
+ARG CHROMIUM_VERSION="144.0.7559.109"
 ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
 RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
   && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \

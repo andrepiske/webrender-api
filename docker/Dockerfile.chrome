@@ -27,8 +27,9 @@ RUN set -eux; \
     node --version && npm --version && yarn --version
 
 # Install google chrome
-ARG GOOGLE_CHROME_VERSION=143.0.7499.192-1
+ARG GOOGLE_CHROME_VERSION=144.0.7559.132-1
 RUN set -eux ; \
+
     apt-get update -y \
     && curl -Lo /tmp/google-chrome.deb "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${GOOGLE_CHROME_VERSION}_amd64.deb" \
     && apt install /tmp/google-chrome.deb -y --no-install-recommends \
