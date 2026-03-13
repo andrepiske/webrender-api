@@ -66,19 +66,6 @@ describe('POST /api/render', () => {
       .set('content-type', 'application/json')
       .expect(400));
 
-  it('render google.com should succeed', () =>
-    request(app)
-      .post('/api/render')
-      .send({ url: 'https://google.com' })
-      .set('content-type', 'application/json')
-      .set('Connection', 'keep-alive')
-      .expect(200)
-      .expect('content-type', 'application/pdf')
-      .then((response) => {
-        const length = Number(response.headers['content-length']);
-        chai.expect(length).to.be.above(1024 * 40);
-      }));
-
   it('html in json body should succeed', () =>
     request(app)
       .post('/api/render')

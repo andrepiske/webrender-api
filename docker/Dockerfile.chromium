@@ -5,8 +5,8 @@ ENV LANG=C.UTF-8
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
-      # gnupg is required to install Chromium
       gnupg \
+      unzip \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -26,25 +26,31 @@ RUN set -eux; \
     # smoke tests
     node --version && npm --version && yarn --version
 
-# Install Chromium
-# ARG CHROMIUM_VERSION="latest"
-ARG CHROMIUM_VERSION="144.0.7559.109"
-ARG CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
-RUN echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list \
-  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
-  && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
-  && apt-get update -qqy \
-  && if [ "${CHROMIUM_VERSION}" = "latest" ]; \
-      then apt-get -y --no-install-recommends install chromium-common chromium chromium-l10n ; \
-     else mkdir -p /tmp/chromium \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-common_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-common.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-l10n_${CHROMIUM_VERSION}-1_all.deb -o /tmp/chromium/chromium-l10n.deb \
-      && curl -fsL ${CHROMIUM_DEB_SITE}/pool/main/c/chromium/chromium-driver_${CHROMIUM_VERSION}-1_$(dpkg --print-architecture).deb -o /tmp/chromium/chromium-driver.deb \
-      && apt-get -qqyf install /tmp/chromium/chromium-common.deb /tmp/chromium/chromium.deb /tmp/chromium/chromium-l10n.deb /tmp/chromium/chromium-driver.deb \
-      && rm -rf /tmp/chromium; \
-    fi \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+# Install Chromium via chromium-list (https://github.com/andrepiske/chromium-list)
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "${ARCH}" in \
+      amd64) \
+        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.2/chromium-list-linux-amd64.zip"; \
+        CHROMIUM_LIST_SHA256="3f149dc7e1bd79e7b1412d6aaee3cde621cb0fd7b1c6182e625590118db37075";; \
+      arm64) \
+        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.2/chromium-list-linux-arm64.zip"; \
+        CHROMIUM_LIST_SHA256="fd3f9b49e5435b4dc0edc15a09742c61fcb8f63986d17930d1bbccf631dbd0e1";; \
+      *) echo "Unsupported architecture: ${ARCH}"; exit 1;; \
+    esac; \
+    curl -fsSL "${CHROMIUM_LIST_URL}" -o /tmp/chromium-list.zip \
+    && echo "${CHROMIUM_LIST_SHA256}  /tmp/chromium-list.zip" | sha256sum -c - \
+    && unzip -o /tmp/chromium-list.zip -d /tmp \
+    && mv /tmp/chromium-list-linux-${ARCH} /tmp/chromium-list \
+    && chmod +x /tmp/chromium-list \
+    && CHROMIUM_DEB_URL=$(/tmp/chromium-list --dist sid) \
+    && curl -fsSL "${CHROMIUM_DEB_URL}" -o /tmp/chromium.deb \
+    && echo "deb https://deb.debian.org/debian/ sid main" > /etc/apt/sources.list.d/debian-sid.list \
+    && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
+    && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
+    && apt-get update -qqy \
+    && apt-get -qqy --no-install-recommends install /tmp/chromium.deb \
+    && rm -rf /etc/apt/sources.list.d/debian-sid.list /tmp/chromium-list.zip /tmp/chromium-list /tmp/chromium.deb /var/lib/apt/lists/* /var/cache/apt/*
 
 ENV BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true
