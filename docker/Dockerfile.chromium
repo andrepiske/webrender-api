@@ -31,11 +31,11 @@ RUN set -eux; \
     ARCH="$(dpkg --print-architecture)"; \
     case "${ARCH}" in \
       amd64) \
-        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.1/chromium-list-linux-amd64.zip"; \
-        CHROMIUM_LIST_SHA256="cf096dbbb50f7d0a583ea41a8ab6a38c010f2a38f1b91c259961a0ca4e7ad57e";; \
+        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.2/chromium-list-linux-amd64.zip"; \
+        CHROMIUM_LIST_SHA256="3f149dc7e1bd79e7b1412d6aaee3cde621cb0fd7b1c6182e625590118db37075";; \
       arm64) \
-        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.1/chromium-list-linux-arm64.zip"; \
-        CHROMIUM_LIST_SHA256="da62844b7fde90b6ab781836d070bc32b093ae98de592ad11d096b37c01ca7f1";; \
+        CHROMIUM_LIST_URL="https://github.com/andrepiske/chromium-list/releases/download/v0.0.2/chromium-list-linux-arm64.zip"; \
+        CHROMIUM_LIST_SHA256="fd3f9b49e5435b4dc0edc15a09742c61fcb8f63986d17930d1bbccf631dbd0e1";; \
       *) echo "Unsupported architecture: ${ARCH}"; exit 1;; \
     esac; \
     curl -fsSL "${CHROMIUM_LIST_URL}" -o /tmp/chromium-list.zip \
@@ -43,7 +43,7 @@ RUN set -eux; \
     && unzip -o /tmp/chromium-list.zip -d /tmp \
     && mv /tmp/chromium-list-linux-${ARCH} /tmp/chromium-list \
     && chmod +x /tmp/chromium-list \
-    && CHROMIUM_DEB_URL=$(/tmp/chromium-list) \
+    && CHROMIUM_DEB_URL=$(/tmp/chromium-list --dist sid) \
     && curl -fsSL "${CHROMIUM_DEB_URL}" -o /tmp/chromium.deb \
     && echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list \
     && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
