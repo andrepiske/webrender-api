@@ -45,7 +45,7 @@ RUN set -eux; \
     && chmod +x /tmp/chromium-list \
     && CHROMIUM_DEB_URL=$(/tmp/chromium-list --dist sid) \
     && curl -fsSL "${CHROMIUM_DEB_URL}" -o /tmp/chromium.deb \
-    && echo "deb http://deb.debian.org/debian/ sid main" > /etc/apt/sources.list.d/debian-sid.list \
+    && echo "deb https://deb.debian.org/debian/ sid main" > /etc/apt/sources.list.d/debian-sid.list \
     && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
     && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
     && apt-get update -qqy \
