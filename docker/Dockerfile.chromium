@@ -45,12 +45,12 @@ RUN set -eux; \
     && chmod +x /tmp/chromium-list \
     && CHROMIUM_DEB_URL=$(/tmp/chromium-list --dist sid) \
     && curl -fsSL "${CHROMIUM_DEB_URL}" -o /tmp/chromium.deb \
-    && echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list \
+    && echo "deb http://deb.debian.org/debian/ sid main" > /etc/apt/sources.list.d/debian-sid.list \
     && curl -fsL https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg \
     && curl -fsL https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg \
     && apt-get update -qqy \
     && apt-get -qqy --no-install-recommends install /tmp/chromium.deb \
-    && rm -rf /tmp/chromium-list.zip /tmp/chromium-list /tmp/chromium.deb /var/lib/apt/lists/* /var/cache/apt/*
+    && rm -rf /etc/apt/sources.list.d/debian-sid.list /tmp/chromium-list.zip /tmp/chromium-list /tmp/chromium.deb /var/lib/apt/lists/* /var/cache/apt/*
 
 ENV BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=true
