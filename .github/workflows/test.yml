@@ -18,7 +18,7 @@ jobs:
         - { label: 'ARM Chromium', browser: 'chromium', platform: 'ubuntu-22.04-arm' }
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Build Docker image
         run: |
