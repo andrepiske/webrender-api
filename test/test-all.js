@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const request = require('supertest');
 const BPromise = require('bluebird');
 const { getResource } = require('./util');
-const pdf = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const createApp = require('../src/app');
 
 const DEBUG = false;
@@ -23,14 +23,13 @@ function normalisePdfText(text) {
   return text.replace(/[\W_]+/g, '-');
 }
 
-function getPdfTextContent(buffer, opts = {}) {
-  return pdf(buffer).then((data) => {
-    if (opts.raw) {
-      return data.text;
-    }
-
-    return normalisePdfText(data.text);
-  });
+async function getPdfTextContent(buffer, opts = {}) {
+  const parser = new PDFParse({ data: buffer });
+  const data = await parser.getText();
+  if (opts.raw) {
+    return data.text;
+  }
+  return normalisePdfText(data.text);
 }
 
 describe('GET /api/render', () => {
