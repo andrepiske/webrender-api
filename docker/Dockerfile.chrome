@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-ENV NODE_VERSION=22.22.0
+ENV NODE_VERSION=22.22.1
 ENV NODE_MAJOR=22
 RUN set -eux; \
     ARCH="$(dpkg --print-architecture)"; \
@@ -27,7 +27,7 @@ RUN set -eux; \
     node --version && npm --version && yarn --version
 
 # Install google chrome
-ARG GOOGLE_CHROME_VERSION=144.0.7559.132-1
+ARG GOOGLE_CHROME_VERSION=146.0.7680.80-1
 RUN set -eux ; \
 
     apt-get update -y \
